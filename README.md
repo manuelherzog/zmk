@@ -1,13 +1,28 @@
-# Zephyr™ Mechanical Keyboard (ZMK) Firmware
+# ZMK Firmware: Personal fork
 
-[![Discord](https://img.shields.io/discord/719497620560543766)](https://zmk.dev/community/discord/invite)
-[![Build](https://github.com/zmkfirmware/zmk/workflows/Build/badge.svg)](https://github.com/zmkfirmware/zmk/actions)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+This is my personal ZMK fork containing various experimental features. It is regularly
+rebased onto the latest upstream. Below is a list of features
+currently included in the `main` branch *on top of* the official ZMK master branch.
 
-[ZMK Firmware](https://zmk.dev/) is an open source (MIT) keyboard firmware built on the [Zephyr™ Project](https://www.zephyrproject.org/) Real Time Operating System (RTOS). ZMK's goal is to provide a modern, wireless, and powerful firmware free of licensing issues.
+* **mouse** (PR #778) - latest rebase: https://github.com/ftc/zmk/tree/mouse-ftc
+* **swapper** (PR #1366) - PR branch: https://github.com/nickconway/zmk/tree/smart-interrupt
+* **global-quick-tap-ms** (PR #1387) - PR branch: https://github.com/andrewjrae/zmk/tree/min-prior-ms
+* **positional-hold-tap-on-release** (PR #1423) - PR branch: https://github.com/urob/zmk/tree/positional-hold-tap-on-release
+* **num-word** (PR #1451) - PR branch: https://github.com/urob/zmk/tree/improve-caps-word
+* **adv360pro** (PR #1454) - PR branch: https://github.com/ReFil/zmk/tree/advantage360
 
-Check out the website to learn more: https://zmk.dev/
-
-You can also come join our [ZMK Discord Server](https://zmk.dev/community/discord/invite)
-
-To review features, check out the [feature overview](https://zmk.dev/docs/). ZMK is under active development, and new features are listed with the [enhancement label](https://github.com/zmkfirmware/zmk/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement) in GitHub. Please feel free to add 👍 to the issue description of any requests to upvote the feature.
+In order to use this branch with Github Actions, replace the contents of `west.yml` in
+your `zmk-config/config` directory with the following contents:
+```
+manifest:
+  remotes:
+    - name: urob
+      url-base: https://github.com/urob
+  projects:
+    - name: zmk
+      remote: urob
+      revision: main
+      import: app/west.yml
+  self:
+    path: config
+```

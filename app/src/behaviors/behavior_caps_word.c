@@ -37,10 +37,10 @@ struct behavior_caps_word_config {
     bool ignore_numbers;
     bool ignore_modifiers;
     uint8_t index;
+    uint8_t additional_alphas_count;
+    struct caps_word_continue_item additional_alphas[4];
     uint8_t continuations_count;
     struct caps_word_continue_item continuations[];
-    uint8_t additional_alphas_count;
-    struct caps_word_continue_item additional_alphas[];
 };
 
 struct behavior_caps_word_data {

@@ -227,7 +227,7 @@ static int behavior_caps_word_init(const struct device *dev) {
         .ignore_modifiers = DT_INST_PROP(n, ignore_modifiers),                                     \
         .continuations = {UTIL_LISTIFY(DT_INST_PROP_LEN(n, continue_list), BREAK_ITEM, n)},        \
         .continuations_count = DT_INST_PROP_LEN(n, continue_list),                                 \
-        .additional_alphas = {UTIL_LISTIFY(DT_INST_PROP_LEN(n, additional_alphas), BREAK_ITEM, n)}, \
+        .additional_alphas = DT_INST_PROP(n, additional_alphas), \
         .additional_alphas_count = DT_INST_PROP_LEN(n, additional_alphas),                         \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, behavior_caps_word_init, NULL, &behavior_caps_word_data_##n,          \

@@ -21,3 +21,5 @@ properties:
     type: boolean
   ignore-modifiers:
     type: boolean
+  additional-alphas:
+    type: array

@@ -39,6 +39,8 @@ struct behavior_caps_word_config {
     uint8_t index;
     uint8_t continuations_count;
     struct caps_word_continue_item continuations[];
+    uint8_t additional_alphas_count;
+    struct caps_word_continue_item additional_alphas[];
 };
 
 struct behavior_caps_word_data {
@@ -119,6 +121,28 @@ static bool caps_word_is_caps_includelist(const struct behavior_caps_word_config
     return false;
 }
 
+static bool caps_word_is_additional_alpha(const struct behavior_caps_word_config *config,
+                                          uint16_t usage_page, uint8_t usage_id,
+                                          uint8_t implicit_modfiers) {
+    for (int i = 0; i < config->additional_alphas_count; i++) {
+        const struct caps_word_continue_item *continuation = &config->additional_alphas[i];
+        LOG_DBG("Comparing with 0x%02X - 0x%02X (with implicit mods: 0x%02X)", continuation->page,
+                continuation->id, continuation->implicit_modifiers);
+
+        if (continuation->page == usage_page && continuation->id == usage_id &&
+            (continuation->implicit_modifiers &
+             (implicit_modifiers | zmk_hid_get_explicit_mods())) ==
+                continuation->implicit_modifiers) {
+            LOG_DBG("Continuing capsword, found included usage: 0x%02X - 0x%02X", usage_page,
+                    usage_id);
+            return true;
+        }
+    }
+
+    return false;
+}
+                                          
+
 static bool caps_word_is_alpha(uint8_t usage_id) {
     return (usage_id >= HID_USAGE_KEY_KEYBOARD_A && usage_id <= HID_USAGE_KEY_KEYBOARD_Z);
 }
@@ -130,7 +154,9 @@ static bool caps_word_is_numeric(uint8_t usage_id) {
 
 static void caps_word_enhance_usage(const struct behavior_caps_word_config *config,
                                     struct zmk_keycode_state_changed *ev) {
-    if (ev->usage_page != HID_USAGE_KEY || !caps_word_is_alpha(ev->keycode)) {
+    if (ev->usage_page != HID_USAGE_KEY 
+       || !caps_word_is_alpha(ev->keycode)
+       || !caps_word_is_additional_alpha(config, ev->usage_page, ev->keycode, ev->implicit_modifiers)) {
         return;
     }
 
@@ -162,6 +188,7 @@ static int caps_word_keycode_state_changed_listener(const zmk_event_t *eh) {
         caps_word_enhance_usage(config, ev);
 
         if ((!caps_word_is_alpha(ev->keycode) || !config->ignore_alphas) &&
+            (!caps_word_is_additional_alpha(config, ev->usage_page, ev->keycode, ev->implicit_modifiers) || !config->ignore_alphas)
             (!caps_word_is_numeric(ev->keycode) || !config->ignore_numbers) &&
             (!is_mod(ev->usage_page, ev->keycode) || !config->ignore_modifiers) &&
             !caps_word_is_caps_includelist(config, ev->usage_page, ev->keycode,
@@ -200,6 +227,8 @@ static int behavior_caps_word_init(const struct device *dev) {
         .ignore_modifiers = DT_INST_PROP(n, ignore_modifiers),                                     \
         .continuations = {UTIL_LISTIFY(DT_INST_PROP_LEN(n, continue_list), BREAK_ITEM, n)},        \
         .continuations_count = DT_INST_PROP_LEN(n, continue_list),                                 \
+        .additional_alphas = {UTIL_LISTIFY(DT_INST_PROP_LEN(n, additional_alphas), BREAK_ITEM, n)}, \
+        .additional_alphas_count = DT_INST_PROP_LEN(n, additional_alphas),                         \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, behavior_caps_word_init, NULL, &behavior_caps_word_data_##n,          \
                           &behavior_caps_word_config_##n, APPLICATION,                             \

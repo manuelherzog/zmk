@@ -123,7 +123,7 @@ static bool caps_word_is_caps_includelist(const struct behavior_caps_word_config
 
 static bool caps_word_is_additional_alpha(const struct behavior_caps_word_config *config,
                                           uint16_t usage_page, uint8_t usage_id,
-                                          uint8_t implicit_modfiers) {
+                                          uint8_t implicit_modifiers) {
     for (int i = 0; i < config->additional_alphas_count; i++) {
         const struct caps_word_continue_item *continuation = &config->additional_alphas[i];
         LOG_DBG("Comparing with 0x%02X - 0x%02X (with implicit mods: 0x%02X)", continuation->page,
